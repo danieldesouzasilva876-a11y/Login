@@ -1,146 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>Hacker Effect</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundo da Matemática - Monitor Daniel</title>
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    overflow:hidden;
-    background:black;
-    font-family:monospace;
-}
-
-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-}
-
-.text{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    color:#00ff00;
-    font-size:60px;
-    text-shadow:
-        0 0 5px #00ff00,
-        0 0 10px #00ff00,
-        0 0 20px #00ff00;
-    z-index:10;
-    animation:pulse 2s infinite;
-}
-
-.sub{
-    position:absolute;
-    top:60%;
-    left:50%;
-    transform:translateX(-50%);
-    color:#00ff00;
-    font-size:20px;
-    z-index:10;
-    opacity:0.8;
-}
-
-@keyframes pulse{
-    0%{
-        opacity:0.7;
-    }
-
-    50%{
-        opacity:1;
-    }
-
-    100%{
-        opacity:0.7;
-    }
-}
+body{font-family:Arial,sans-serif;background:#eef3f8;margin:0}
+header{background:#1f4e79;color:white;padding:25px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+button{padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-size:16px;margin:5px}
+.primary{background:#1f4e79;color:white}
+.success{background:#2e8b57;color:white}
+.question{padding:10px;border-bottom:1px solid #ddd}
+input{width:100px;padding:6px}
+#quiz,#resultado{display:none}
+.score{font-size:20px;font-weight:bold}
 </style>
 </head>
-
 <body>
+<header>
+<h1>🧮 Mundo da Matemática</h1>
+<h3>Monitor Daniel</h3>
+</header>
 
-<canvas id="matrix"></canvas>
-
-<div class="text">
-    ACCESS GRANTED
+<div class="container">
+<div class="card" id="inicio">
+<h2>Bem-vindo!</h2>
+<p>Treine multiplicação e divisão com correção automática.</p>
+<button class="primary" onclick="iniciar('mult')">Multiplicação</button>
+<button class="success" onclick="iniciar('div')">Divisão</button>
 </div>
 
-<div class="sub">
-    SYSTEM ONLINE...
+<div class="card" id="quiz">
+<h2 id="titulo"></h2>
+<p class="score">Pontuação: <span id="score">0</span></p>
+<div id="perguntas"></div>
+<br>
+<button class="primary" onclick="corrigir()">Corrigir Respostas</button>
+</div>
+
+<div class="card" id="resultado">
+<h2>Resultado</h2>
+<p id="final"></p>
+<button class="success" onclick="location.reload()">Recomeçar</button>
+</div>
 </div>
 
 <script>
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+let respostas=[];
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function iniciar(tipo){
+document.getElementById('inicio').style.display='none';
+document.getElementById('quiz').style.display='block';
 
-const letters =
-"01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let area=document.getElementById('perguntas');
+area.innerHTML='';
+respostas=[];
 
-const chars = letters.split("");
+document.getElementById('titulo').innerText =
+tipo==='mult' ? '100 Questões de Multiplicação' : '100 Questões de Divisão';
 
-const fontSize = 16;
+for(let i=1;i<=100;i++){
+let a,b,res,texto;
 
-const columns = canvas.width / fontSize;
-
-const drops = [];
-
-for(let i = 0; i < columns; i++){
-    drops[i] = 1;
+if(tipo==='mult'){
+a=Math.floor(Math.random()*90)+10;
+b=Math.floor(Math.random()*90)+10;
+res=a*b;
+texto=`${a} × ${b}`;
+}else{
+res=Math.floor(Math.random()*90)+10;
+b=Math.floor(Math.random()*9)+2;
+a=res*b;
+texto=`${a} ÷ ${b}`;
 }
 
-function draw(){
+respostas.push(res);
 
-    ctx.fillStyle = "rgba(0,0,0,0.05)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle = "#00ff00";
-    ctx.font = fontSize + "px monospace";
-
-    for(let i = 0; i < drops.length; i++){
-
-        const text = chars[
-            Math.floor(Math.random() * chars.length)
-        ];
-
-        ctx.fillText(
-            text,
-            i * fontSize,
-            drops[i] * fontSize
-        );
-
-        if(
-            drops[i] * fontSize > canvas.height &&
-            Math.random() > 0.975
-        ){
-            drops[i] = 0;
-        }
-
-        drops[i]++;
-    }
+area.innerHTML += `
+<div class="question">
+${i}) ${texto} =
+<input type="number" id="r${i}">
+</div>`;
+}
 }
 
-setInterval(draw, 35);
+function corrigir(){
+let pontos=0;
 
-window.addEventListener("resize", () => {
+for(let i=1;i<=100;i++){
+let valor=document.getElementById('r'+i).value;
+if(Number(valor)===respostas[i-1]) pontos++;
+}
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-});
+document.getElementById('quiz').style.display='none';
+document.getElementById('resultado').style.display='block';
+document.getElementById('final').innerHTML=
+`Você acertou <b>${pontos}</b> de 100 questões.<br>
+Aproveitamento: <b>${pontos}%</b>`;
+}
 </script>
-
 </body>
 </html>
