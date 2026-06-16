@@ -3,35 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Obrigado 9° Ano</title>
+<title>Mundo da Matemática - Monitor Daniel</title>
 <style>
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#e8f0ff,#ffffff);
-font-family:Arial,sans-serif;
-}
-.container{text-align:center;}
-img{
-max-width:80vw;
-max-height:70vh;
-border-radius:20px;
-box-shadow:0 8px 25px rgba(0,0,0,.25);
-}
-h1{
-font-size:3rem;
-color:#1f3c88;
-margin-top:20px;
-}
+body{font-family:Arial,sans-serif;background:#eef3f8;margin:0}
+header{background:#1f4e79;color:white;padding:25px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+button{padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-size:16px;margin:5px}
+.primary{background:#1f4e79;color:white}
+.success{background:#2e8b57;color:white}
+.question{padding:10px;border-bottom:1px solid #ddd}
+input{width:100px;padding:6px}
+#quiz,#resultado{display:none}
+.score{font-size:20px;font-weight:bold}
 </style>
 </head>
 <body>
+<header>
+<h1>🧮 Mundo da Matemática</h1>
+<h3>Monitor Daniel</h3>
+</header>
+
 <div class="container">
-<img src="foto.heic" alt="Foto">
-<h1>Obrigado 9° Ano</h1>
+<div class="card" id="inicio">
+<h2>Bem-vindo!</h2>
+<p>Treine multiplicação e divisão com correção automática.</p>
+<button class="primary" onclick="iniciar('mult')">Multiplicação</button>
+<button class="success" onclick="iniciar('div')">Divisão</button>
 </div>
+
+<div class="card" id="quiz">
+<h2 id="titulo"></h2>
+<p class="score">Pontuação: <span id="score">0</span></p>
+<div id="perguntas"></div>
+<br>
+<button class="primary" onclick="corrigir()">Corrigir Respostas</button>
+</div>
+
+<div class="card" id="resultado">
+<h2>Resultado</h2>
+<p id="final"></p>
+<button class="success" onclick="location.reload()">Recomeçar</button>
+</div>
+</div>
+
+<script>
+let respostas=[];
+
+function iniciar(tipo){
+document.getElementById('inicio').style.display='none';
+document.getElementById('quiz').style.display='block';
+
+let area=document.getElementById('perguntas');
+area.innerHTML='';
+respostas=[];
+
+document.getElementById('titulo').innerText =
+tipo==='mult' ? '100 Questões de Multiplicação' : '100 Questões de Divisão';
+
+for(let i=1;i<=100;i++){
+let a,b,res,texto;
+
+if(tipo==='mult'){
+a=Math.floor(Math.random()*90)+10;
+b=Math.floor(Math.random()*90)+10;
+res=a*b;
+texto=`${a} × ${b}`;
+}else{
+res=Math.floor(Math.random()*90)+10;
+b=Math.floor(Math.random()*9)+2;
+a=res*b;
+texto=`${a} ÷ ${b}`;
+}
+
+respostas.push(res);
+
+area.innerHTML += `
+<div class="question">
+${i}) ${texto} =
+<input type="number" id="r${i}">
+</div>`;
+}
+}
+
+function corrigir(){
+let pontos=0;
+
+for(let i=1;i<=100;i++){
+let valor=document.getElementById('r'+i).value;
+if(Number(valor)===respostas[i-1]) pontos++;
+}
+
+document.getElementById('quiz').style.display='none';
+document.getElementById('resultado').style.display='block';
+document.getElementById('final').innerHTML=
+`Você acertou <b>${pontos}</b> de 100 questões.<br>
+Aproveitamento: <b>${pontos}%</b>`;
+}
+</script>
 </body>
 </html>
